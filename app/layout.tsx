@@ -61,7 +61,7 @@ export const metadata: Metadata = {
     description:
       "Step into Candy Land 🍬 and discover PAWPAW — the meme coin that spreads happiness and love across the Solana universe!",
     url: "https://pawpawthecutest.art",
-    siteName: "PAWPAW",
+    siteName: "PAWPAW" ,
     images: [
       {
         url: "/images/bannerpaw1.png",
