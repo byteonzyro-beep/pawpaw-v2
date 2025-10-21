@@ -330,7 +330,7 @@ export default function Home() {
   >
     {/* 🐾 TITLE */}
     <h3 className="ca-text text-lg md:text-xl font-extrabold tracking-wider text-center mb-2">
-      🐾 PAWPAW
+      🩷 PAWPAW 🩷
     </h3>
 
     {/* ✨ DESCRIPTION */}

@@ -88,10 +88,16 @@ export default function ChatWithPawpaw() {
         <p className="text-pink-200 text-sm italic mt-2">Pawpaw is here~ 💫</p>
       </motion.div>
 
-      {/* === TITLE === */}
-      <h2 className="text-3xl font-extrabold text-pink-200 mb-4 text-center drop-shadow-[0_0_10px_rgba(255,200,250,0.6)]">
-         Chat with Pawpaw 🐾
-      </h2>
+    {/* === TITLE === */}
+<h2
+  className="ca-text text-3xl md:text-4xl font-extrabold tracking-wider text-center 
+  drop-shadow-[0_0_25px_rgba(255,180,240,0.6)] 
+  hover:drop-shadow-[0_0_45px_rgba(255,200,250,0.8)] 
+  transition-all duration-300 select-none"
+>
+  Fun Chat with Pawpaw 🩷 
+</h2>
+
 
       {/* === CHAT AREA === */}
       <div className="h-72 overflow-y-auto mb-4 bg-white/10 p-4 rounded-2xl border border-white/20">
@@ -156,7 +162,7 @@ export default function ChatWithPawpaw() {
           whileTap={{ scale: 0.95 }}
           className="px-5 py-2 rounded-2xl bg-pink-400 hover:bg-pink-500 text-white font-bold transition-all shadow-lg"
         >
-          {loading ? "..." : "Send 💌"}
+          {loading ? "..." : "🐾"}
         </motion.button>
       </div>
     </motion.div>

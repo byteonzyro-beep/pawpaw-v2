@@ -1,16 +1,100 @@
 import { NextResponse } from "next/server";
 
-export async function POST(req: Request) {
-  try {
-    const { message } = await req.json();
+// 🧠 Cache untuk rate limit sederhana (in-memory)
+const userRequests = new Map<string, { count: number; lastRequest: number }>();
 
-    // 🔑 Ambil API key dari environment
-    const apiKey = process.env.OPENAI_API_KEY;
-    if (!apiKey) {
-      throw new Error("Missing OpenAI API key");
+// ⚙️ Konfigurasi limit
+const MAX_REQUESTS = 5; // batas chat
+const TIME_WINDOW = 15 * 1000; // 15 detik
+
+// 🧩 Tipe untuk request body
+interface ChatRequest {
+  message: string;
+}
+
+// 🧩 Tipe respons dari OpenAI
+interface OpenAIResponse {
+  choices?: Array<{
+    message?: {
+      content?: string;
+    };
+  }>;
+}
+
+export async function POST(req: Request): Promise<NextResponse> {
+  try {
+    const ip =
+      req.headers.get("x-forwarded-for") ||
+      req.headers.get("x-real-ip") ||
+      "unknown";
+    const now = Date.now();
+
+    // 🧱 Ambil data rate limit
+    const userData = userRequests.get(ip) || { count: 0, lastRequest: now };
+    const timeSinceLast = now - userData.lastRequest;
+
+    // Reset hitungan kalau lewat window waktu
+    if (timeSinceLast > TIME_WINDOW) {
+      userRequests.set(ip, { count: 1, lastRequest: now });
+    } else {
+      userData.count++;
+      userData.lastRequest = now;
+      userRequests.set(ip, userData);
+
+      // 🚨 Kalau user terlalu sering chat
+      if (userData.count > MAX_REQUESTS) {
+        console.warn(`🐾 Spam detected from ${ip}`);
+        return NextResponse.json(
+          {
+            reply:
+              "nyaw... Pawpaw’s ears are ringing from too much talking 💫 Wait a bit, nya~",
+          },
+          { status: 429 }
+        );
+      }
     }
 
-    // 🧠 Kirim permintaan ke OpenAI API
+    // 🧩 Parse dan validasi input
+    const body = (await req.json()) as ChatRequest;
+    const { message } = body;
+
+    if (!message || typeof message !== "string" || message.length > 500) {
+      return NextResponse.json(
+        {
+          reply:
+            "meep~ Pawpaw can only handle short, sweet messages nyaaa 🐾",
+        },
+        { status: 400 }
+      );
+    }
+
+    // 🧩 Filter kata kasar / spam dasar
+    const badWords = ["sex", "kill", "fuck", "nude", "terror", "bomb"];
+    const isBad = badWords.some((word) =>
+      message.toLowerCase().includes(word)
+    );
+    if (isBad) {
+      console.warn(`🚫 Blocked bad message from ${ip}`);
+      return NextResponse.json(
+        {
+          reply:
+            "uh-oh... Pawpaw doesn’t like scary or rude words nyaaa 💢",
+        },
+        { status: 403 }
+      );
+    }
+
+    // 🔑 API Key
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) {
+      console.error("❌ Missing OpenAI API key");
+      return NextResponse.json(
+        { reply: "uh-oh... Pawpaw lost the magic key 🍭" },
+        { status: 500 }
+      );
+    }
+
+    // 🧠 Kirim permintaan ke OpenAI
     const completion = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -18,7 +102,7 @@ export async function POST(req: Request) {
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: "gpt-4o-mini", // ⚙️ Model stabil & cepat
+        model: "gpt-4o-mini",
         messages: [
           {
             role: "system",
@@ -29,37 +113,48 @@ export async function POST(req: Request) {
               Be friendly, kind, and a little silly. You love humans and always make them smile.
             `,
           },
-          {
-            role: "user",
-            content: message,
-          },
+          { role: "user", content: message },
         ],
-        temperature: 0.8,
+        temperature: 0.85,
         max_tokens: 300,
       }),
     });
 
-    // ⚠️ Jika API error (401, 429, dsb)
+    // ⚠️ Error dari API
     if (!completion.ok) {
       const errText = await completion.text();
       console.error("🐾 Pawpaw API error:", errText);
-      return NextResponse.json({
-        reply: "nyaw... Pawpaw got dizzy from too much sugar! 🍬 Try again later, meow~",
-      });
+
+      return NextResponse.json(
+        {
+          reply:
+            "nyaw... Pawpaw got dizzy from too much sugar! 🍬 Try again later~",
+        },
+        { status: completion.status }
+      );
     }
 
-    // ✅ Ambil hasil dari API
-    const data = await completion.json();
+    // ✅ Ambil hasil dan validasi tipe
+    const data = (await completion.json()) as OpenAIResponse;
     const reply = data.choices?.[0]?.message?.content?.trim();
 
     return NextResponse.json({
-      reply: reply || "nyaw... Pawpaw’s brain is full of cotton candy right now 🍭",
+      reply:
+        reply ||
+        "nyaw... Pawpaw’s brain is full of cotton candy right now 🍭",
     });
-  } catch (error: any) {
-    console.error("💥 Server error:", error.message);
-    return NextResponse.json({
-      reply: "meep! Pawpaw’s tail got tangled... please try again later 💫",
-    });
+  } catch (error) {
+    const err = error as Error;
+    console.error("💥 Server error:", err.message);
+    return NextResponse.json(
+      {
+        reply:
+          "meep! Pawpaw’s tail got tangled... please try again later 💫",
+      },
+      { status: 500 }
+    );
   }
 }
-console.log("🐾 API Key loaded?", !!process.env.OPENAI_API_KEY);
+
+// 🐾 Log server saat route aktif
+console.log("🐾 Pawpaw Chat API secured and ready! 🧁");
