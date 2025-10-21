@@ -152,7 +152,7 @@ export default function Navbar({ muted, setMuted }: NavbarProps) {
 
       {/* 💖 BUY PAWPAW BUTTON — styled like menu items */}
 <a
-  href="https://pump.fun/"
+  href="https://pump.fun/coin/21vAPnJ8jm2QEro7Qw28JuDENL2t9iAk5D1kTRDzpump"
   target="_blank"
   className="relative px-8 py-3 rounded-full font-semibold text-sm
              bg-gradient-to-r from-white via-[#fff5fb] to-[#ffeaf5]

@@ -126,7 +126,7 @@ export default function Home() {
         >
           <div
             onClick={() =>
-              navigator.clipboard.writeText("0x9aC3bA0E1b2F9eCFeD2bC9f7E4D21d44fA11A234")
+              navigator.clipboard.writeText("21vAPnJ8jm2QEro7Qw28JuDENL2t9iAk5D1kTRDzpump")
             }
             className="ca-panel cursor-none select-none px-10 py-4 rounded-2xl backdrop-blur-xl 
             bg-white/10 border border-white/20 shadow-[0_0_30px_rgba(255,150,210,0.3)] 
@@ -136,7 +136,7 @@ export default function Home() {
               🐾 CA
             </h3>
             <p className="ca-text text-sm md:text-base font-bold tracking-widest mt-2 text-center opacity-90 select-none">
-              0x9aC3bA0E1b2F9eCFeD2bC9f7E4D21d44fA11A23999
+              21vAPnJ8jm2QEro7Qw28JuDENL2t9iAk5D1kTRDzpump
             </p>
             <p className="text-xs text-white/70 mt-1 italic">(Click to copy)</p>
           </div>
@@ -366,7 +366,7 @@ export default function Home() {
           {[
             { name: "X", icon: "/images/xlogo.png", link: "https://x.com/pawpawthecutest/" },
             { name: "DEXSCREENER", icon: "/images/dex.png", link: "https://dexscreener.com/" },
-            { name: "PUMP.FUN", icon: "/images/pump.png", link: "https://pump.fun/" },
+            { name: "PUMP.FUN", icon: "/images/pump.png", link: "https://pump.fun/coin/21vAPnJ8jm2QEro7Qw28JuDENL2t9iAk5D1kTRDzpump" },
           ].map((item, i) => (
             <motion.a
               key={item.name}
